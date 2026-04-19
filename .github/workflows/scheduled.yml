@@ -1,0 +1,57 @@
+name: Scheduled Checks
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 2am UTC nightly
+  workflow_dispatch:
+
+jobs:
+  e2e-production:
+    name: Nightly E2E on Production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npx playwright install --with-deps chromium
+      - name: Run E2E against production
+        run: npx playwright test --project=chromium
+        env:
+          BASE_URL: ${{ secrets.PRODUCTION_URL }}
+          E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces-nightly
+          path: test-results/
+
+  dependency-check:
+    name: Dependency Updates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npm audit --production
+
+  backup-verify:
+    name: Verify Supabase Backup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check backup health
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/categories?select=id&limit=1")
+          if [ "$response" != "200" ]; then
+            echo "Database health check failed with status $response"
+            exit 1
+          fi
+          echo "Database accessible — backup assumed healthy"

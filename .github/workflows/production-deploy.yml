@@ -1,0 +1,47 @@
+name: Production Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply Supabase migrations to production
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: |
+          supabase db push \
+            --db-url "${{ secrets.SUPABASE_PROD_DB_URL }}"
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+
+      - name: Tag release
+        run: |
+          TAG="v-$(date +%Y.%m.%d)-$(git rev-parse --short HEAD)"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      - name: Post deploy notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "Production deploy ${{ job.status }} — ${{ github.event.head_commit.message }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

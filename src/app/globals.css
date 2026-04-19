@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+@import 'tailwindcss-animate';
+
+@theme {
+  /* Brand colors */
+  --color-stone-50: oklch(98.5% 0.004 80);
+  --color-stone-100: oklch(96.8% 0.006 80);
+  --color-stone-200: oklch(92.8% 0.009 80);
+  --color-stone-300: oklch(86.8% 0.014 80);
+  --color-stone-400: oklch(76.8% 0.018 80);
+  --color-stone-500: oklch(64.8% 0.024 80);
+  --color-stone-600: oklch(54.6% 0.027 80);
+  --color-stone-700: oklch(43.9% 0.026 80);
+  --color-stone-800: oklch(35.4% 0.022 80);
+  --color-stone-900: oklch(27.8% 0.018 80);
+  --color-stone-950: oklch(20.1% 0.013 80);
+
+  /* Perfume accent — warm amber */
+  --color-amber-300: oklch(87% 0.14 80);
+  --color-amber-400: oklch(80% 0.16 75);
+  --color-amber-500: oklch(73% 0.18 68);
+  --color-amber-600: oklch(65% 0.18 60);
+
+  /* Clothing accent — muted sage */
+  --color-sage-300: oklch(80% 0.05 155);
+  --color-sage-400: oklch(70% 0.07 155);
+  --color-sage-500: oklch(58% 0.08 155);
+  --color-sage-600: oklch(46% 0.09 155);
+
+  /* Typography */
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-112: 28rem;
+  --spacing-128: 32rem;
+
+  /* Radius */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+
+  /* Transitions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(98.5% 0.004 80);
+  --foreground: oklch(20% 0.01 80);
+  --muted: oklch(96.8% 0.006 80);
+  --muted-foreground: oklch(54.6% 0.027 80);
+  --border: oklch(88% 0.01 80);
+  --input: oklch(88% 0.01 80);
+  --accent: oklch(73% 0.18 68);
+  --accent-foreground: oklch(98.5% 0.004 80);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(20% 0.01 80);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(20% 0.01 80);
+  --primary: oklch(20% 0.01 80);
+  --primary-foreground: oklch(98.5% 0.004 80);
+  --secondary: oklch(96.8% 0.006 80);
+  --secondary-foreground: oklch(20% 0.01 80);
+  --destructive: oklch(60% 0.22 25);
+  --ring: oklch(73% 0.18 68);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(15% 0.008 60);
+  --foreground: oklch(93% 0.008 80);
+  --muted: oklch(20% 0.01 60);
+  --muted-foreground: oklch(64% 0.018 80);
+  --border: oklch(28% 0.014 60);
+  --input: oklch(28% 0.014 60);
+  --accent: oklch(73% 0.18 68);
+  --accent-foreground: oklch(15% 0.008 60);
+  --card: oklch(18% 0.009 60);
+  --card-foreground: oklch(93% 0.008 80);
+  --popover: oklch(18% 0.009 60);
+  --popover-foreground: oklch(93% 0.008 80);
+  --primary: oklch(93% 0.008 80);
+  --primary-foreground: oklch(15% 0.008 60);
+  --secondary: oklch(22% 0.012 60);
+  --secondary-foreground: oklch(93% 0.008 80);
+  --destructive: oklch(60% 0.22 25);
+  --ring: oklch(73% 0.18 68);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: var(--ring);
+  }
+
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
