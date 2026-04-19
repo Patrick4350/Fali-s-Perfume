@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProductGallery } from '@/components/storefront/product-gallery'
 import { ProductInfo } from '@/components/storefront/product-info'
 import { RelatedProducts } from '@/components/storefront/related-products'
+import { RealtimeStock } from '@/components/storefront/realtime-stock'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Metadata } from 'next'
 
@@ -75,6 +76,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
       />
 
       <div className="pt-16">
+        <RealtimeStock
+          productId={product.id}
+          initialStock={Object.fromEntries(
+            product.product_variants.map((v) => [v.id, v.stock_quantity])
+          )}
+        />
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-2 lg:gap-16">
             <ProductGallery media={product.product_media} productName={product.name} />

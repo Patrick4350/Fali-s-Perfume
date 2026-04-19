@@ -3,20 +3,17 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import type { Variants, Variant } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 
-type DelayedVariant = (delay: number) => Variant
-
-const fadeUp: Variants = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fadeUp: any = {
   hidden: { opacity: 0, y: 24 },
-  visible: ((delay: number) =>
-    ({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] },
-    }) as Variant) as unknown as DelayedVariant,
+  visible: (delay: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] },
+  }),
 }
 
 export function HeroSection() {
