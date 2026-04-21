@@ -45,7 +45,8 @@ export async function updateSession(request: NextRequest) {
 
     if (profile?.role !== 'admin') {
       const url = request.nextUrl.clone()
-      url.pathname = '/'
+      url.pathname = '/login'
+      url.searchParams.set('error', 'Admin access only')
       return NextResponse.redirect(url)
     }
   }

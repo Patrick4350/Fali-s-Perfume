@@ -5,6 +5,7 @@ const footerLinks = {
   Shop: [
     { label: 'Perfume', href: '/perfume' },
     { label: 'Clothing', href: '/clothing' },
+    { label: 'Bags', href: '/bags' },
     { label: 'New Arrivals', href: '/new-arrivals' },
     { label: 'Gift Sets', href: '/gifts' },
   ],
@@ -32,8 +33,8 @@ export function Footer() {
               Fali&apos;s
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[var(--muted-foreground)]">
-              Artisanal perfumes and refined clothing, crafted for those who appreciate the quiet
-              luxury of intention.
+              Artisanal perfumes, refined clothing, and handcrafted bags — made for those who
+              appreciate the quiet luxury of intention.
             </p>
           </div>
 

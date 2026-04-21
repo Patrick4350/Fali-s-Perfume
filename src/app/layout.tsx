@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Inter, Fraunces } from 'next/font/google'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
+import { PostHogProvider } from '@/components/providers/posthog-provider'
+import { AuthErrorHandler } from '@/components/auth/auth-error-handler'
 import './globals.css'
 
 const inter = Inter({
@@ -55,9 +57,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <QueryProvider>{children}</QueryProvider>
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+            <QueryProvider>
+              <AuthErrorHandler />
+              {children}
+            </QueryProvider>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   )

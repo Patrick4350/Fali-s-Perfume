@@ -15,9 +15,9 @@ const categories = [
       'Each fragrance is a composition — layered, intentional, and made to linger. From eau de parfum to pure extrait.',
     href: '/perfume',
     image:
-      'https://images.unsplash.com/photo-1541643600914-78b084683702?w=1200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=1200&auto=format&fit=crop&q=80',
     imageAlt: 'Collection of artisanal perfume bottles',
-    accent: 'amber',
+    accentClass: 'text-amber-300',
     cta: 'Explore Fragrances',
   },
   {
@@ -30,8 +30,21 @@ const categories = [
     image:
       'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=1200&auto=format&fit=crop&q=80',
     imageAlt: 'Editorial clothing laid flat on neutral surface',
-    accent: 'sage',
+    accentClass: 'text-[oklch(80%_0.05_155)]',
     cta: 'View Collection',
+  },
+  {
+    id: 'bags',
+    label: 'Bags',
+    tagline: 'Crafted to carry, made to last',
+    description:
+      'Each bag is shaped by hand from premium leathers and natural materials — designed with quiet confidence.',
+    href: '/bags',
+    image:
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=1200&auto=format&fit=crop&q=80',
+    imageAlt: 'Handcrafted leather bag on neutral background',
+    accentClass: 'text-stone-300',
+    cta: 'Shop Bags',
   },
 ]
 
@@ -42,7 +55,7 @@ export function CategorySplit() {
         Shop by Category
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {categories.map((cat, i) => (
           <motion.div
             key={cat.id}
@@ -50,7 +63,7 @@ export function CategorySplit() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.6, delay: i * 0.15 }}
-            className="group relative aspect-[4/5] overflow-hidden"
+            className="group relative aspect-[3/4] overflow-hidden sm:aspect-[4/5]"
           >
             <Image
               src={cat.image}
@@ -62,11 +75,7 @@ export function CategorySplit() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
             <div className="absolute inset-0 flex flex-col justify-end p-8 lg:p-12">
-              <p
-                className={`text-xs font-medium tracking-[0.2em] uppercase ${
-                  cat.accent === 'amber' ? 'text-amber-300' : 'text-[oklch(80%_0.05_155)]'
-                }`}
-              >
+              <p className={`text-xs font-medium tracking-[0.2em] uppercase ${cat.accentClass}`}>
                 {cat.tagline}
               </p>
 

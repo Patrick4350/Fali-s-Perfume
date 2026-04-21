@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { CategoryForm } from '@/components/admin/categories/category-form'
+import { DeleteCategoryButton } from '@/components/admin/categories/delete-category-button'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Categories — Admin' }
@@ -9,11 +11,13 @@ export default async function AdminCategoriesPage() {
     .from('categories')
     .select('*, products(id)')
     .order('type')
-    .order('name')
+    .order('sort_order')
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Categories</h1>
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Categories</h1>
+      </div>
 
       <div className="overflow-hidden rounded-lg border border-[var(--border)]">
         <table className="w-full text-sm">
@@ -23,11 +27,12 @@ export default async function AdminCategoriesPage() {
               <th className="px-4 py-3 text-left font-medium">Type</th>
               <th className="px-4 py-3 text-left font-medium">Slug</th>
               <th className="px-4 py-3 text-left font-medium">Products</th>
+              <th className="px-4 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border)]">
             {(categories ?? []).map((cat) => (
-              <tr key={cat.id}>
+              <tr key={cat.id} className="hover:bg-[var(--muted)]/20">
                 <td className="px-4 py-3 font-medium">{cat.name}</td>
                 <td className="px-4 py-3 text-[var(--muted-foreground)] capitalize">{cat.type}</td>
                 <td className="px-4 py-3 font-mono text-xs text-[var(--muted-foreground)]">
@@ -36,22 +41,29 @@ export default async function AdminCategoriesPage() {
                 <td className="px-4 py-3 text-[var(--muted-foreground)]">
                   {(cat.products as unknown[]).length}
                 </td>
+                <td className="px-4 py-3 text-right">
+                  <DeleteCategoryButton
+                    id={cat.id}
+                    productCount={(cat.products as unknown[]).length}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
         {!categories?.length && (
           <p className="px-4 py-8 text-center text-sm text-[var(--muted-foreground)]">
-            No categories found. Run migrations and seed the database.
+            No categories yet. Add one below.
           </p>
         )}
       </div>
 
-      <p className="text-xs text-[var(--muted-foreground)]">
-        Categories are managed via SQL migrations. To add or rename a category, create a new
-        migration in{' '}
-        <code className="rounded bg-[var(--muted)] px-1 py-0.5">supabase/migrations/</code>.
-      </p>
+      <div>
+        <h2 className="mb-4 text-sm font-semibold tracking-widest text-[var(--muted-foreground)] uppercase">
+          New category
+        </h2>
+        <CategoryForm categories={categories ?? []} />
+      </div>
     </div>
   )
 }

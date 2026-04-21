@@ -39,7 +39,7 @@ export type Database = {
           name: string
           description: string | null
           parent_id: string | null
-          type: 'perfume' | 'clothing'
+          type: 'perfume' | 'clothing' | 'bags'
           image_url: string | null
           sort_order: number
           is_active: boolean
@@ -51,7 +51,7 @@ export type Database = {
           name: string
           description?: string | null
           parent_id?: string | null
-          type: 'perfume' | 'clothing'
+          type: 'perfume' | 'clothing' | 'bags'
           image_url?: string | null
           sort_order?: number
           is_active?: boolean
@@ -62,7 +62,7 @@ export type Database = {
           name?: string
           description?: string | null
           parent_id?: string | null
-          type?: 'perfume' | 'clothing'
+          type?: 'perfume' | 'clothing' | 'bags'
           image_url?: string | null
           sort_order?: number
           is_active?: boolean
@@ -486,7 +486,7 @@ export type Database = {
     }
     Enums: {
       user_role: 'customer' | 'admin'
-      category_type: 'perfume' | 'clothing'
+      category_type: 'perfume' | 'clothing' | 'bags'
       media_type: 'image' | 'video'
       order_status:
         | 'pending'

@@ -244,6 +244,7 @@ create or replace function public.decrement_stock_on_order()
 returns trigger language plpgsql as $$
 declare
   v_stock integer;
+  r record;
 begin
   -- Only act when status changes to 'paid'
   if old.status != 'paid' and new.status = 'paid' then

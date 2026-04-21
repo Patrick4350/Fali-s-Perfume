@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Heart, Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,8 @@ import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import type { ProductWithMedia } from '@/types'
 import { generateId } from '@/lib/utils'
+import { usePostHog } from 'posthog-js/react'
+import { Events } from '@/lib/analytics-events'
 
 interface ProductInfoProps {
   product: ProductWithMedia
@@ -25,6 +27,18 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
+  const ph = usePostHog()
+
+  useEffect(() => {
+    ph.capture(Events.PRODUCT_VIEWED, {
+      product_id: product.id,
+      product_name: product.name,
+      product_brand: product.brand,
+      product_price: product.base_price,
+      category_id: product.category_id,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id])
 
   const selectedVariant = product.product_variants.find((v) => v.id === selectedVariantId)
   const price = selectedVariant?.price_override ?? product.base_price
@@ -43,6 +57,18 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
   const handleAddToCart = () => {
     if (!selectedVariant || isOutOfStock) return
+
+    ph.capture(Events.ADD_TO_CART, {
+      product_id: product.id,
+      product_name: product.name,
+      product_brand: product.brand,
+      variant_id: selectedVariant.id,
+      variant_sku: selectedVariant.sku,
+      variant_size: selectedVariant.size,
+      variant_color: selectedVariant.color,
+      price: selectedVariant.price_override ?? product.base_price,
+      quantity,
+    })
 
     setIsAdding(true)
     addItem({
@@ -194,7 +220,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
           size="icon"
           aria-label="Add to wishlist"
           onClick={() => {
-            // TODO: wishlist action
+            ph.capture(Events.ADD_TO_WISHLIST, {
+              product_id: product.id,
+              product_name: product.name,
+              variant_id: selectedVariantId,
+            })
           }}
         >
           <Heart className="h-4 w-4" />

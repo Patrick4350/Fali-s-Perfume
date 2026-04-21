@@ -3,7 +3,13 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: "Sign In — Fali's" }
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirectTo?: string; error?: string }>
+}) {
+  const { redirectTo, error } = await searchParams
+
   return (
     <div className="flex min-h-dvh items-center justify-center px-4 py-20">
       <div className="w-full max-w-sm">
@@ -13,7 +19,12 @@ export default function LoginPage() {
             Sign in to your Fali&apos;s account
           </p>
         </div>
-        <LoginForm />
+        {error && (
+          <p className="mb-4 rounded-md bg-red-50 px-4 py-2 text-center text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
+            {error}
+          </p>
+        )}
+        <LoginForm redirectTo={redirectTo} />
       </div>
     </div>
   )

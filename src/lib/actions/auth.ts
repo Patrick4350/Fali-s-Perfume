@@ -51,17 +51,22 @@ export async function signIn(_prev: unknown, formData: FormData) {
   if (error) return { error: error.message }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  const redirectTo = formData.get('redirectTo')?.toString()
+  redirect(redirectTo && redirectTo.startsWith('/') ? redirectTo : '/')
 }
 
 export async function signInWithMagicLink(_prev: unknown, formData: FormData) {
   const email = formData.get('email')?.toString().trim()
   if (!email) return { error: 'Email is required' }
 
+  const redirectTo = formData.get('redirectTo')?.toString()
+  const next = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+    options: { emailRedirectTo: `${appUrl}/auth/callback?next=${encodeURIComponent(next)}` },
   })
 
   if (error) return { error: error.message }

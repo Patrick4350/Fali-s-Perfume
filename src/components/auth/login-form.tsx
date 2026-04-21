@@ -9,7 +9,7 @@ import { signIn, signInWithMagicLink } from '@/lib/actions/auth'
 
 type ActionState = { error?: string; success?: boolean } | null
 
-export function LoginForm() {
+export function LoginForm({ redirectTo }: { redirectTo?: string }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(signIn, null)
   const [magicState, magicAction, magicPending] = useActionState<ActionState, FormData>(
     signInWithMagicLink,
@@ -46,6 +46,7 @@ export function LoginForm() {
 
       {mode === 'password' ? (
         <form action={action} className="space-y-4">
+          {redirectTo && <input type="hidden" name="redirectTo" value={redirectTo} />}
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" autoComplete="email" required />
@@ -75,6 +76,7 @@ export function LoginForm() {
         </form>
       ) : (
         <form action={magicAction} className="space-y-4">
+          {redirectTo && <input type="hidden" name="redirectTo" value={redirectTo} />}
           <div className="space-y-1.5">
             <Label htmlFor="magic-email">Email</Label>
             <Input id="magic-email" name="email" type="email" autoComplete="email" required />

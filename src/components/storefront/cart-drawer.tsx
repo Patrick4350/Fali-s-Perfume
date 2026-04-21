@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { formatCurrency } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { usePostHog } from 'posthog-js/react'
+import { Events } from '@/lib/analytics-events'
 
 export function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen)
@@ -17,6 +19,7 @@ export function CartDrawer() {
   const total = useCartStore((s) => s.total())
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
+  const ph = usePostHog()
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
@@ -127,10 +130,26 @@ export function CartDrawer() {
               </p>
               <Separator />
               <div className="space-y-2">
-                <Button className="w-full" size="lg" asChild>
-                  <Link href="/checkout" onClick={closeCart}>
-                    Proceed to Checkout
-                  </Link>
+                <Button
+                  className="w-full"
+                  size="lg"
+                  asChild
+                  onClick={() => {
+                    ph.capture(Events.CHECKOUT_STARTED, {
+                      item_count: items.length,
+                      total,
+                      items: items.map((i) => ({
+                        product_id: i.product_id,
+                        product_name: i.products.name,
+                        variant_id: i.variant_id,
+                        quantity: i.quantity,
+                        price: i.product_variants.price_override ?? i.products.base_price,
+                      })),
+                    })
+                    closeCart()
+                  }}
+                >
+                  <Link href="/checkout">Proceed to Checkout</Link>
                 </Button>
                 <Button variant="outline" className="w-full" asChild onClick={closeCart}>
                   <Link href="/cart">View Cart</Link>

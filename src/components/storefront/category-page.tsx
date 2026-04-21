@@ -5,12 +5,12 @@ import { SortSelect } from '@/components/storefront/sort-select'
 import type { SortOption } from '@/types'
 
 interface CategoryPageProps {
-  type: 'perfume' | 'clothing'
+  type: 'perfume' | 'clothing' | 'bags'
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 async function getProducts(
-  type: 'perfume' | 'clothing',
+  type: 'perfume' | 'clothing' | 'bags',
   params: Record<string, string | string[] | undefined>
 ) {
   const supabase = await createClient()
@@ -80,7 +80,7 @@ async function getProducts(
   return products
 }
 
-async function getFilterOptions(type: 'perfume' | 'clothing') {
+async function getFilterOptions(type: 'perfume' | 'clothing' | 'bags') {
   const supabase = await createClient()
 
   const { data: products } = await supabase
@@ -109,6 +109,11 @@ async function getFilterOptions(type: 'perfume' | 'clothing') {
 const typeLabels = {
   perfume: { title: 'Perfume', description: 'Artisanal fragrances for every mood and moment.' },
   clothing: { title: 'Clothing', description: 'Refined garments in natural fabrics.' },
+  bags: {
+    title: 'Bags',
+    description:
+      'Handcrafted bags in premium leather and natural materials — shaped for quiet confidence.',
+  },
 }
 
 export async function CategoryPage({ type, searchParams }: CategoryPageProps) {

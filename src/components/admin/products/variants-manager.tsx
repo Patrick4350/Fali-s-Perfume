@@ -93,16 +93,31 @@ export function VariantsManager({ productId, variants }: VariantsManagerProps) {
           <input type="hidden" name="product_id" value={productId} />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div className="space-y-1.5">
-              <Label htmlFor="sku">SKU *</Label>
-              <Input id="sku" name="sku" required />
+              <Label htmlFor="sku">SKU</Label>
+              <Input
+                id="sku"
+                name="sku"
+                required
+                defaultValue={`SKU-${Date.now().toString(36).toUpperCase()}`}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="size">Size</Label>
-              <Input id="size" name="size" placeholder="e.g. 50ml, S, M" />
+              <Input
+                id="size"
+                name="size"
+                placeholder="e.g. 50ml, S, One Size"
+                defaultValue="One Size"
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="color">Color</Label>
-              <Input id="color" name="color" />
+              <Input
+                id="color"
+                name="color"
+                placeholder="e.g. Black, Beige"
+                defaultValue="Default"
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="price_override">Price override</Label>
