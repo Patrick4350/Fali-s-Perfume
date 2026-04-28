@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
+import { useCurrencyStore } from '@/stores/currency'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -19,6 +20,7 @@ export function CartDrawer() {
   const total = useCartStore((s) => s.total())
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
+  const currency = useCurrencyStore((s) => s.currency)
   const ph = usePostHog()
 
   return (
@@ -79,7 +81,9 @@ export function CartDrawer() {
                               {item.product_variants.color && ` / ${item.product_variants.color}`}
                             </p>
                           )}
-                          <p className="mt-1 text-sm font-medium">{formatCurrency(price)}</p>
+                          <p className="mt-1 text-sm font-medium">
+                            {formatCurrency(price, currency)}
+                          </p>
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -123,7 +127,7 @@ export function CartDrawer() {
             <div className="space-y-4 border-t border-[var(--border)] px-6 py-6">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-[var(--muted-foreground)]">Subtotal</span>
-                <span className="text-base font-medium">{formatCurrency(total)}</span>
+                <span className="text-base font-medium">{formatCurrency(total, currency)}</span>
               </div>
               <p className="text-xs text-[var(--muted-foreground)]">
                 Shipping and taxes calculated at checkout

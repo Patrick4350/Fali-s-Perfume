@@ -23,12 +23,19 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isWide, setIsWide] = useState(false)
   const { theme, setTheme } = useTheme()
   const itemCount = useCartStore((s) => s.itemCount())
   const openCart = useCartStore((s) => s.openCart)
   const ph = usePostHog()
 
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    setMounted(true)
+    const check = () => setIsWide(window.innerWidth >= 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
@@ -53,7 +60,7 @@ export function Header() {
           'fixed inset-x-0 top-0 z-40 transition-all duration-500',
           isScrolled
             ? 'border-b border-[var(--border)] bg-[var(--background)]/95 shadow-sm backdrop-blur-md'
-            : 'bg-transparent'
+            : 'bg-[var(--background)]/60 backdrop-blur-sm'
         )}
       >
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -68,49 +75,51 @@ export function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <ul className="hidden items-center gap-8 lg:flex" role="list">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm tracking-wide text-[var(--muted-foreground)] transition-colors duration-200 hover:text-[var(--foreground)]"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {isWide && (
+            <ul className="flex items-center gap-6" role="list">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm tracking-wide text-[var(--foreground)] transition-colors duration-200 hover:opacity-70"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              asChild
-              aria-label="Search"
-              className="hidden md:flex"
-            >
-              <Link href="/search">
-                <Search className="h-4 w-4" />
-              </Link>
-            </Button>
+            {isWide && (
+              <Button variant="ghost" size="icon-sm" asChild aria-label="Search">
+                <Link href="/search">
+                  <Search className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
 
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label={
-                mounted
-                  ? theme === 'dark'
-                    ? 'Switch to light mode'
-                    : 'Switch to dark mode'
-                  : 'Toggle theme'
-              }
-              className="hidden md:flex"
-            >
-              <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-              <Moon className="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-            </Button>
+            {isWide && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                aria-label={
+                  mounted
+                    ? theme === 'dark'
+                      ? 'Switch to light mode'
+                      : 'Switch to dark mode'
+                    : 'Toggle theme'
+                }
+              >
+                {mounted && theme === 'dark' ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            )}
 
             <Button
               variant="ghost"
@@ -119,11 +128,11 @@ export function Header() {
                 ph.capture(Events.CART_OPENED, { item_count: itemCount })
                 openCart()
               }}
-              aria-label={`Open cart (${itemCount} items)`}
+              aria-label={mounted ? `Open cart (${itemCount} items)` : 'Open cart'}
               className="relative"
             >
               <ShoppingBag className="h-4 w-4" />
-              {itemCount > 0 && (
+              {mounted && itemCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -137,7 +146,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon-sm"
-              className="lg:hidden"
+              className={isWide ? 'hidden' : ''}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMobileMenuOpen}
@@ -185,7 +194,7 @@ export function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden"
               onClick={closeMenu}
             />
 
@@ -196,7 +205,7 @@ export function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="fixed inset-y-0 right-0 z-40 flex w-80 max-w-[85vw] flex-col bg-[var(--background)] shadow-2xl lg:hidden"
+              className="fixed inset-y-0 right-0 z-40 flex w-80 max-w-[85vw] flex-col bg-[var(--background)] shadow-2xl md:hidden"
             >
               {/* Panel header */}
               <div className="flex h-16 items-center justify-between border-b border-[var(--border)] px-6">

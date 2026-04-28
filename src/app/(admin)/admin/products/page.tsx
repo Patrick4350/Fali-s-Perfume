@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { formatCurrency } from '@/lib/utils'
+import { getStoreCurrency } from '@/lib/currency'
 import { Button } from '@/components/ui/button'
 import { DeleteProductButton } from '@/components/admin/products/delete-product-button'
 import type { Metadata } from 'next'
@@ -10,12 +11,15 @@ export const metadata: Metadata = { title: 'Products — Admin' }
 export default async function AdminProductsPage() {
   const supabase = await createClient()
 
-  const { data: products } = await supabase
-    .from('products')
-    .select(
-      'id, name, slug, brand, base_price, is_published, categories(name), product_variants(stock_quantity)'
-    )
-    .order('created_at', { ascending: false })
+  const [currency, { data: products }] = await Promise.all([
+    getStoreCurrency(),
+    supabase
+      .from('products')
+      .select(
+        'id, name, slug, brand, base_price, is_published, categories(name), product_variants(stock_quantity)'
+      )
+      .order('created_at', { ascending: false }),
+  ])
 
   return (
     <div className="space-y-6">
@@ -54,7 +58,7 @@ export default async function AdminProductsPage() {
                   <td className="px-4 py-3 text-[var(--muted-foreground)]">
                     {category?.name ?? '—'}
                   </td>
-                  <td className="px-4 py-3">{formatCurrency(product.base_price)}</td>
+                  <td className="px-4 py-3">{formatCurrency(product.base_price, currency)}</td>
                   <td className="px-4 py-3">
                     <span
                       className={

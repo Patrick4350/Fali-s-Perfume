@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatCurrency } from '@/lib/utils'
+import { getStoreCurrency } from '@/lib/currency'
 import { ShoppingBag, AlertTriangle } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -44,24 +45,24 @@ async function getStats() {
 }
 
 export default async function AdminOverviewPage() {
-  const stats = await getStats()
+  const [stats, currency] = await Promise.all([getStats(), getStoreCurrency()])
 
   const cards = [
     {
       label: 'Revenue Today',
-      value: formatCurrency(stats.revenueToday),
+      value: formatCurrency(stats.revenueToday, currency),
       sub: `${stats.ordersToday} orders`,
       icon: ShoppingBag,
     },
     {
       label: 'Revenue (7d)',
-      value: formatCurrency(stats.revenue7d),
+      value: formatCurrency(stats.revenue7d, currency),
       sub: `${stats.orders7d} orders`,
       icon: ShoppingBag,
     },
     {
       label: 'Revenue (30d)',
-      value: formatCurrency(stats.revenue30d),
+      value: formatCurrency(stats.revenue30d, currency),
       sub: `${stats.orders30d} orders`,
       icon: ShoppingBag,
     },
@@ -131,7 +132,7 @@ export default async function AdminOverviewPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">{formatCurrency(order.total)}</p>
+                    <p className="text-sm font-medium">{formatCurrency(order.total, currency)}</p>
                     <span className="text-xs text-[var(--muted-foreground)] capitalize">
                       {order.status}
                     </span>

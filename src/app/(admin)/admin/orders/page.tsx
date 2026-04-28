@@ -1,27 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { getStoreCurrency } from '@/lib/currency'
+import { OrderStatusSelect } from '@/components/admin/orders/order-status-select'
 import type { Metadata } from 'next'
+import type { OrderStatus } from '@/lib/actions/orders'
 
 export const metadata: Metadata = { title: 'Orders — Admin' }
-
-const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200',
-  paid: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200',
-  fulfilled: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200',
-  shipped: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200',
-  delivered: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200',
-  cancelled: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200',
-  refunded: 'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200',
-}
 
 export default async function OrdersPage() {
   const supabase = await createClient()
 
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
+  const [{ data: orders }, currency] = await Promise.all([
+    supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(100),
+    getStoreCurrency(),
+  ])
 
   return (
     <div className="space-y-6">
@@ -61,22 +53,19 @@ export default async function OrdersPage() {
                 </tr>
               )}
               {orders?.map((order) => (
-                <tr key={order.id} className="transition-colors hover:bg-[var(--muted)]">
+                <tr key={order.id} className="transition-colors hover:bg-[var(--muted)]/40">
                   <td className="px-4 py-3 font-mono text-xs text-[var(--muted-foreground)]">
                     #{order.id.slice(-8).toUpperCase()}
                   </td>
                   <td className="px-4 py-3">{order.email}</td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${
-                        statusColors[order.status] ?? ''
-                      }`}
-                    >
-                      {order.status}
-                    </span>
+                    <OrderStatusSelect
+                      orderId={order.id}
+                      currentStatus={order.status as OrderStatus}
+                    />
                   </td>
                   <td className="px-4 py-3 text-right font-medium">
-                    {formatCurrency(order.total)}
+                    {formatCurrency(order.total, currency)}
                   </td>
                   <td className="px-4 py-3 text-right text-[var(--muted-foreground)]">
                     {formatDate(order.created_at)}

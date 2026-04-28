@@ -7,6 +7,7 @@ import { Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
+import { useCurrencyStore } from '@/stores/currency'
 import type { ProductWithMedia } from '@/types'
 
 interface ProductCardProps {
@@ -16,6 +17,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index = 0, className }: ProductCardProps) {
+  const currency = useCurrencyStore((s) => s.currency)
   const primaryImage = product.product_media?.[0]
   const hoverImage = product.product_media?.[1]
   const lowestPrice = Math.min(
@@ -99,7 +101,9 @@ export function ProductCard({ product, index = 0, className }: ProductCardProps)
         <div className="mt-3 space-y-0.5">
           <p className="text-xs text-[var(--muted-foreground)]">{product.brand}</p>
           <p className="text-sm leading-snug font-medium">{product.name}</p>
-          <p className="text-sm text-[var(--muted-foreground)]">{formatCurrency(lowestPrice)}</p>
+          <p className="text-sm text-[var(--muted-foreground)]">
+            {formatCurrency(lowestPrice, currency)}
+          </p>
         </div>
       </Link>
     </motion.div>

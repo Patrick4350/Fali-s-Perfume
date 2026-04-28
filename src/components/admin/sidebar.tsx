@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import {
   LayoutDashboard,
   Package,
@@ -27,9 +28,19 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    const check = () => setShow(window.innerWidth >= 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  if (!show) return null
 
   return (
-    <aside className="hidden w-56 flex-col border-r border-[var(--border)] bg-[var(--card)] lg:flex">
+    <aside className="flex w-56 flex-col border-r border-[var(--border)] bg-[var(--card)]">
       <div className="flex h-14 items-center border-b border-[var(--border)] px-4">
         <Link href="/admin" className="font-serif text-base font-light tracking-widest uppercase">
           Fali&apos;s

@@ -1,12 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { Heart, Minus, Plus } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { toggleWishlist, getWishlistStatus } from '@/lib/actions/wishlist'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { useCartStore } from '@/stores/cart'
+import { useCurrencyStore } from '@/stores/currency'
 import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import type { ProductWithMedia } from '@/types'
@@ -24,10 +27,34 @@ export function ProductInfo({ product }: ProductInfoProps) {
   )
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const [wishlisted, setWishlisted] = useState(false)
+  const [wishlistPending, startWishlist] = useTransition()
 
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
+  const currency = useCurrencyStore((s) => s.currency)
   const ph = usePostHog()
+  const router = useRouter()
+
+  useEffect(() => {
+    getWishlistStatus(product.id).then(setWishlisted)
+  }, [product.id])
+
+  const handleWishlist = () => {
+    startWishlist(async () => {
+      const result = await toggleWishlist(product.id)
+      if (result.requiresLogin) {
+        router.push(`/login?redirectTo=/products/${product.slug}`)
+        return
+      }
+      setWishlisted(result.wishlisted)
+      ph.capture(Events.ADD_TO_WISHLIST, {
+        product_id: product.id,
+        product_name: product.name,
+        wishlisted: result.wishlisted,
+      })
+    })
+  }
 
   useEffect(() => {
     ph.capture(Events.PRODUCT_VIEWED, {
@@ -99,7 +126,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <h1 className="mt-1 font-serif text-3xl font-light tracking-tight sm:text-4xl">
           {product.name}
         </h1>
-        <p className="mt-3 text-2xl font-light">{formatCurrency(price)}</p>
+        <p className="mt-3 text-2xl font-light">{formatCurrency(price, currency)}</p>
       </div>
 
       <Separator />
@@ -218,16 +245,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <Button
           variant="outline"
           size="icon"
-          aria-label="Add to wishlist"
-          onClick={() => {
-            ph.capture(Events.ADD_TO_WISHLIST, {
-              product_id: product.id,
-              product_name: product.name,
-              variant_id: selectedVariantId,
-            })
-          }}
+          aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          onClick={handleWishlist}
+          disabled={wishlistPending}
         >
-          <Heart className="h-4 w-4" />
+          <Heart
+            className="h-4 w-4 transition-colors"
+            fill={wishlisted ? 'currentColor' : 'none'}
+          />
         </Button>
       </div>
 

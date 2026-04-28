@@ -84,7 +84,7 @@ export function SearchInput({ defaultValue = '' }: SearchInputProps) {
         <Search className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
         <input
           ref={inputRef}
-          type="search"
+          type="text"
           placeholder="Search perfumes, clothing…"
           value={value}
           onChange={handleChange}

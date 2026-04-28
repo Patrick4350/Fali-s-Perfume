@@ -20,7 +20,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -39,6 +39,16 @@ export function AdminHeader({ user }: { user: { name: string; email: string } })
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [isWide, setIsWide] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const check = () => setIsWide(window.innerWidth >= 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const handleSignOut = async () => {
     const supabase = createClient()
@@ -50,7 +60,7 @@ export function AdminHeader({ user }: { user: { name: string; email: string } })
     <>
       <header className="flex h-14 items-center justify-between border-b border-[var(--border)] px-4 lg:px-6">
         {/* Mobile: logo + hamburger */}
-        <div className="flex items-center gap-3 lg:hidden">
+        <div className={`flex items-center gap-3 ${isWide ? 'hidden' : ''}`}>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -67,20 +77,21 @@ export function AdminHeader({ user }: { user: { name: string; email: string } })
           </Link>
         </div>
 
-        <div className="hidden lg:block" />
+        <div />
 
         <div className="flex items-center gap-3">
-          <span className="hidden text-xs text-[var(--muted-foreground)] sm:block">
-            {user.email}
-          </span>
+          {isWide && <span className="text-xs text-[var(--muted-foreground)]">{user.email}</span>}
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             aria-label="Toggle theme"
           >
-            <Sun className="h-3.5 w-3.5 dark:hidden" />
-            <Moon className="hidden h-3.5 w-3.5 dark:block" />
+            {mounted && theme === 'dark' ? (
+              <Sun className="h-3.5 w-3.5" />
+            ) : (
+              <Moon className="h-3.5 w-3.5" />
+            )}
           </Button>
           <Button variant="ghost" size="icon-sm" onClick={handleSignOut} aria-label="Sign out">
             <LogOut className="h-3.5 w-3.5" />
@@ -90,7 +101,7 @@ export function AdminHeader({ user }: { user: { name: string; email: string } })
 
       {/* Mobile drawer */}
       {open && (
-        <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50 md:hidden" onClick={() => setOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <nav
             className="absolute inset-y-0 left-0 w-64 bg-[var(--card)] shadow-xl"
